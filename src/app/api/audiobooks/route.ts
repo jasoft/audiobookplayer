@@ -1,7 +1,8 @@
-import type { NextApiRequest, NextApiResponse } from "next";
 import fs from "fs/promises";
 import path from "path";
-import type { Audiobook, Chapter } from "../types";
+import type { Audiobook, Chapter } from "~/app/types";
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
 // 设置有声书目录的路径
 const AUDIOBOOKS_DIR = path.join(process.cwd(), "public", "audiobooks");
@@ -23,8 +24,8 @@ async function getAudiobooks(): Promise<Audiobook[]> {
             .filter((file) => path.extname(file).toLowerCase() === ".mp3")
             .map((file, chapterIndex) => ({
               id: `${index + 1}-${chapterIndex + 1}`,
-              title: path.basename(file, ".mp3"),
-              fileName: file,
+              title: path.join(bookDir, path.basename(file, ".mp3")),
+              fileName: path.join("/audiobooks", bookDir, file),
             }));
           return {
             id: (index + 1).toString(),
@@ -41,35 +42,22 @@ async function getAudiobooks(): Promise<Audiobook[]> {
   }
 }
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse<Audiobook[] | Audiobook | { message: string }>,
-) {
-  if (req.method === "GET") {
-    const { id } = req.query;
-
-    try {
-      const audiobooks = await getAudiobooks();
-
-      if (id) {
-        // 如果提供了id，返回特定的有声书
-        const audiobook = audiobooks.find((book) => book.id === id);
-        if (audiobook) {
-          res.status(200).json(audiobook);
-        } else {
-          res.status(404).json({ message: "未找到指定的有声书" });
-        }
-      } else {
-        // 如果没有提供id，返回所有有声书的列表
-        res.status(200).json(audiobooks);
+export async function GET(request: NextRequest) {
+  try {
+    const audiobooks = await getAudiobooks();
+    const id = request.nextUrl.searchParams.get("id");
+    if (id) {
+      // 如果提供了id，返回特定的有声书
+      const audiobook = audiobooks.find((book) => book.id === id);
+      if (audiobook) {
+        return NextResponse.json(audiobook);
       }
-    } catch (error) {
-      console.error("Error processing request:", error);
-      res.status(500).json({ message: "服务器内部错误" });
+    } else {
+      // 如果没有提供id，返回所有有声书的列表
+      return NextResponse.json(audiobooks);
     }
-  } else {
-    // 对于非GET请求，返回405 Method Not Allowed
-    res.setHeader("Allow", ["GET"]);
-    res.status(405).end(`Method ${req.method} Not Allowed`);
+  } catch (error) {
+    console.error("Error processing request:", error);
+    return NextResponse.json({ message: "服务器内部错误" }, { status: 500 });
   }
 }

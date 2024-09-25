@@ -56,11 +56,10 @@ export default function AudiobookApp() {
     const chapter = book?.chapters.find(
       (c) => c.id === currentChapter.chapterId,
     );
-    const chapterTitle = chapter ? chapter.title : "";
 
-    return (
-      <AudioPlayer chapterTitle={chapterTitle} onReturn={handleReturnToList} />
-    );
+    return chapter ? (
+      <AudioPlayer chapter={chapter} onReturn={handleReturnToList} />
+    ) : null;
   }
 
   return <BookList books={books} onChapterSelect={handleChapterSelect} />;
