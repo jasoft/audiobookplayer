@@ -2,7 +2,6 @@ import fs from "fs/promises";
 import path from "path";
 import type { Audiobook, Chapter } from "~/app/types";
 import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
 
 // 设置有声书目录的路径
 const AUDIOBOOKS_DIR = path.join(process.cwd(), "public", "audiobooks");
@@ -10,54 +9,71 @@ console.log(AUDIOBOOKS_DIR);
 
 async function getAudiobooks(): Promise<Audiobook[]> {
   try {
+    console.log("开始扫描有声书目录");
     const bookDirs = await fs.readdir(AUDIOBOOKS_DIR);
-    const books: Audiobook[] = (
-      await Promise.all(
-        bookDirs.map(async (bookDir, index) => {
-          const bookPath = path.join(AUDIOBOOKS_DIR, bookDir);
-          const stats = await fs.stat(bookPath);
-          if (!stats.isDirectory()) {
-            return null;
-          }
-          const chapterFiles = await fs.readdir(bookPath);
-          const chapters: Chapter[] = chapterFiles
-            .filter((file) => path.extname(file).toLowerCase() === ".mp3")
-            .map((file, chapterIndex) => ({
-              id: `${index + 1}-${chapterIndex + 1}`,
-              title: path.join(bookDir, path.basename(file, ".mp3")),
-              fileName: path.join("/audiobooks", bookDir, file),
-            }));
-          return {
-            id: (index + 1).toString(),
-            title: bookDir,
-            chapters,
-          };
-        }),
-      )
-    ).filter((book): book is Audiobook => book !== null);
+    console.log(`找到 ${bookDirs.length} 个目录`);
+    const books: Audiobook[] = [];
+
+    for (let index = 0; index < bookDirs.length; index++) {
+      const bookDir = bookDirs[index];
+      if (!bookDir) {
+        continue;
+      }
+      console.log(`正在处理目录: ${bookDir}`);
+      const bookPath = path.join(AUDIOBOOKS_DIR, bookDir);
+      const stats = await fs.stat(bookPath);
+
+      if (stats.isDirectory()) {
+        console.log(`${bookDir} 是一个有效的目录`);
+        const chapterFiles = await fs.readdir(bookPath);
+        console.log(`在 ${bookDir} 中找到 ${chapterFiles.length} 个文件`);
+        const chapters: Chapter[] = chapterFiles
+          .filter((file) => path.extname(file).toLowerCase() === ".mp3")
+          .map((file, chapterIndex) => ({
+            id: `${index + 1}-${chapterIndex + 1}`,
+            title: path.basename(file, ".mp3"),
+            fileName: path.join("/audiobooks", bookDir, file),
+            bookTitle: bookDir,
+          }));
+
+        console.log(`${bookDir} 包含 ${chapters.length} 个章节`);
+        books.push({
+          id: (index + 1).toString(),
+          title: bookDir,
+          chapters,
+        });
+      } else {
+        console.log(`${bookDir} 不是一个目录，跳过`);
+      }
+    }
+
+    console.log(`扫描完成，共找到 ${books.length} 本有声书`);
     return books;
   } catch (error) {
-    console.error("Error reading audiobooks directory:", error);
+    console.error("读取有声书目录时出错：", error);
     return [];
   }
 }
 
-export async function GET(request: NextRequest) {
+export async function GET(
+  request: Request,
+  { params }: { params?: { id?: string[] } },
+) {
   try {
     const audiobooks = await getAudiobooks();
-    const id = request.nextUrl.searchParams.get("id");
+    const id = params?.id?.[0];
+
     if (id) {
-      // 如果提供了id，返回特定的有声书
       const audiobook = audiobooks.find((book) => book.id === id);
       if (audiobook) {
         return NextResponse.json(audiobook);
       }
+      return NextResponse.json({ message: "未找到有声书" }, { status: 404 });
     } else {
-      // 如果没有提供id，返回所有有声书的列表
       return NextResponse.json(audiobooks);
     }
   } catch (error) {
-    console.error("Error processing request:", error);
+    console.error("处理请求时出错:", error);
     return NextResponse.json({ message: "服务器内部错误" }, { status: 500 });
   }
 }

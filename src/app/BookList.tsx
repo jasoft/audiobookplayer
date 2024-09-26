@@ -38,14 +38,14 @@ export function BookList({ books, onChapterSelect }: BookListProps) {
                   <ChevronRight className="mr-2 h-5 w-5 text-primary" />
                 )}
                 <Book className="mr-2 h-5 w-5 text-primary" />
-                <span className="font-medium">{book.title}</span>
+                <span className="text-xl font-semibold">{book.title}</span>
               </div>
               {expandedBooks.includes(book.id) && (
                 <ul className="space-y-1 py-2 pl-8">
                   {book.chapters.map((chapter, index) => (
                     <li
                       key={index}
-                      className="flex cursor-pointer items-center text-sm text-gray-600 hover:text-primary"
+                      className="mt-2 flex cursor-pointer items-center rounded-sm bg-slate-100 p-2 text-lg text-gray-600 hover:text-primary"
                       onClick={() => onChapterSelect(book.id, chapter.id)}
                     >
                       <FileText className="mr-2 h-4 w-4" />
