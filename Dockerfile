@@ -7,6 +7,8 @@ WORKDIR /app
 # 复制 package.json 和 package-lock.json（如果存在）
 COPY package*.json ./
 
+# 设置国内镜像源
+RUN npm config set registry https://registry.npmmirror.com
 # 安装项目依赖
 RUN npm ci
 
