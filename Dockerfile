@@ -23,4 +23,4 @@ COPY . .
 EXPOSE 3000
 
 # 启动 Next.
-CMD ["npm run dev"]
+CMD ["npm", "run", "dev"]
