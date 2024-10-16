@@ -10,6 +10,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@ngrok/ngrok": "^1.4.1",
     "@radix-ui/react-icons": "^1.3.0",
     "@radix-ui/react-slider": "^1.2.0",
     "@radix-ui/react-slot": "^1.1.0",

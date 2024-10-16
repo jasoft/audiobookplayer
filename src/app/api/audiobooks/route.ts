@@ -27,6 +27,7 @@ async function getAudiobooks(): Promise<Audiobook[]> {
         console.log(`${bookDir} 是一个有效的目录`);
         const chapterFiles = await fs.readdir(bookPath);
         console.log(`在 ${bookDir} 中找到 ${chapterFiles.length} 个文件`);
+
         const chapters: Chapter[] = chapterFiles
           .filter((file) => path.extname(file).toLowerCase() === ".mp3")
           .map((file, chapterIndex) => ({
@@ -36,12 +37,16 @@ async function getAudiobooks(): Promise<Audiobook[]> {
             bookTitle: bookDir,
           }));
 
-        console.log(`${bookDir} 包含 ${chapters.length} 个章节`);
-        books.push({
-          id: (index + 1).toString(),
-          title: bookDir,
-          chapters,
-        });
+        if (chapters.length > 0) {
+          console.log(`${bookDir} 包含 ${chapters.length} 个章节`);
+          books.push({
+            id: (index + 1).toString(),
+            title: bookDir,
+            chapters,
+          });
+        } else {
+          console.log(`${bookDir} 没有有效的章节，跳过`);
+        }
       } else {
         console.log(`${bookDir} 不是一个目录，跳过`);
       }

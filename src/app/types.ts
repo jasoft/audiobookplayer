@@ -4,6 +4,7 @@ export type Chapter = {
   title: string;
   fileName: string;
   bookTitle: string;
+  book: Audiobook;
 };
 
 export type Audiobook = {

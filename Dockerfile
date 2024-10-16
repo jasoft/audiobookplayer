@@ -20,5 +20,5 @@ COPY . .
 # 暴露端口（Next.js 默认使用 3000 端口）
 EXPOSE 3000
 
-# 运行应用
-CMD ["npm", "run", "dev"]
+# 启动 Next.
+CMD ["npm run dev"]

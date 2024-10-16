@@ -10,7 +10,27 @@ interface AudioPlayerProps {
   onReturn: () => void;
 }
 
+import { useState } from "react";
+
 export function AudioPlayer({ chapter, onReturn }: AudioPlayerProps) {
+  const [currentChapterIndex, setCurrentChapterIndex] = useState(
+    chapter.book.chapters.findIndex((ch) => ch.id === chapter.id),
+  );
+
+  const handleNextChapter = () => {
+    if (currentChapterIndex < chapter.book.chapters.length - 1) {
+      setCurrentChapterIndex(currentChapterIndex + 1);
+    }
+  };
+
+  const handlePreviousChapter = () => {
+    if (currentChapterIndex > 0) {
+      setCurrentChapterIndex(currentChapterIndex - 1);
+    }
+  };
+
+  const currentChapter = chapter.book.chapters[currentChapterIndex];
+
   return (
     <div className="mx-auto max-w-sm rounded-lg bg-background p-4 shadow-lg">
       <Button variant="ghost" onClick={onReturn} className="mb-4">
@@ -19,11 +39,24 @@ export function AudioPlayer({ chapter, onReturn }: AudioPlayerProps) {
           返回章节列表
         </h2>
       </Button>
-      <h2 className="mb-4 text-center text-xl font-semibold">
-        {chapter.bookTitle} - {chapter.title}
-      </h2>
+      {currentChapter ? (
+        <h2 className="mb-4 text-center text-xl font-semibold">
+          {currentChapter.bookTitle} - {currentChapter.title}
+        </h2>
+      ) : (
+        <h2 className="mb-4 text-center text-xl font-semibold">未找到章节</h2>
+      )}
 
-      <H5AudioPlayer autoPlay src={chapter.fileName} />
+      {currentChapter && (
+        <H5AudioPlayer
+          autoPlay
+          showSkipControls={true}
+          src={currentChapter.fileName}
+          onEnded={handleNextChapter}
+          onClickNext={handleNextChapter}
+          onClickPrevious={handlePreviousChapter}
+        />
+      )}
     </div>
   );
 }
