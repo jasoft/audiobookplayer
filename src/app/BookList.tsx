@@ -21,7 +21,7 @@ export function BookList({ books, onChapterSelect }: BookListProps) {
   return (
     <div className="mx-auto w-full max-w-md overflow-hidden rounded-lg bg-white shadow-lg">
       <div className="p-2">
-        <h2 className="mb-6 mt-2 text-center text-3xl font-bold text-gray-800">
+        <h2 className="mb-2 mt-2 text-center text-3xl font-bold text-gray-800">
           我的有声书
         </h2>
         <ul className="space-y-4">
@@ -31,7 +31,7 @@ export function BookList({ books, onChapterSelect }: BookListProps) {
               className="border-b border-gray-300 last:border-b-0"
             >
               <div
-                className="flex cursor-pointer items-center px-4 py-3 transition-colors duration-200 hover:bg-gray-50"
+                className="flex cursor-pointer items-center px-1 py-2 transition-colors duration-200 hover:bg-gray-50"
                 onClick={() => toggleBook(book.id)}
               >
                 <Book className="mr-3 h-8 w-8 flex-shrink-0 text-indigo-500" />

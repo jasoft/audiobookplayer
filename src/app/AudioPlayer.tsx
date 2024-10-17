@@ -33,9 +33,9 @@ export function AudioPlayer({ chapter, onReturn }: AudioPlayerProps) {
 
   return (
     <div className="mx-auto max-w-sm rounded-lg bg-background p-4 shadow-lg">
-      <Button variant="ghost" onClick={onReturn} className="mb-4">
-        <ArrowLeft className="mr-2 h-4 w-4" />
-        <h2 className="rounded-sm bg-slate-100 p-1 text-xl font-semibold">
+      <Button variant="ghost" onClick={onReturn} className="mb-4 p-0">
+        <ArrowLeft className="h-4 w-4" />
+        <h2 className="flex rounded-sm p-1 text-xl font-semibold">
           返回章节列表
         </h2>
       </Button>
