@@ -21,7 +21,7 @@ export function BookList({ books, onChapterSelect }: BookListProps) {
   return (
     <div className="mx-auto w-full max-w-md overflow-hidden rounded-lg bg-white shadow-lg">
       <div className="p-2">
-        <h2 className="mb-6 text-center text-3xl font-bold text-gray-800">
+        <h2 className="mb-6 mt-2 text-center text-3xl font-bold text-gray-800">
           我的有声书
         </h2>
         <ul className="space-y-4">
