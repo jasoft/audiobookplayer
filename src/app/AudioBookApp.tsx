@@ -44,7 +44,7 @@ export default function AudiobookApp() {
   };
 
   if (isLoading) {
-    return <div className="p-4 text-center">Loading audiobooks...</div>;
+    return <div className="p-4 text-center">正在读取有声书数据...</div>;
   }
 
   if (error) {

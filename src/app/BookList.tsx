@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ChevronRight, ChevronDown, Book, FileText } from "lucide-react";
+import { Book, FileText } from "lucide-react";
 import type { Audiobook } from "./types";
 
 interface BookListProps {

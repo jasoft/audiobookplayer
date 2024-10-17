@@ -8,6 +8,22 @@ const AUDIOBOOKS_DIR = path.join(process.cwd(), "public", "audiobooks");
 console.log(AUDIOBOOKS_DIR);
 
 async function getAudiobooks(): Promise<Audiobook[]> {
+  const cacheFilePath = path.join(AUDIOBOOKS_DIR, "audiobooks_cache.json");
+  const cacheExpiryTime = 60 * 60 * 1000; // 1 hour in milliseconds
+
+  try {
+    const cacheStats = await fs.stat(cacheFilePath);
+    const now = Date.now();
+
+    if (now - cacheStats.mtimeMs < cacheExpiryTime) {
+      console.log("使用缓存的有声书数据");
+      const cachedData = await fs.readFile(cacheFilePath, "utf-8");
+      return JSON.parse(cachedData) as Audiobook[];
+    }
+  } catch (error) {
+    console.log("缓存文件不存在或读取缓存文件时出错，重新扫描目录", error);
+  }
+
   try {
     console.log("开始扫描有声书目录");
     const bookDirs = await fs.readdir(AUDIOBOOKS_DIR);
@@ -35,6 +51,11 @@ async function getAudiobooks(): Promise<Audiobook[]> {
             title: path.basename(file, ".mp3"),
             fileName: path.join("/audiobooks", bookDir, file),
             bookTitle: bookDir,
+            book: {
+              id: (index + 1).toString(),
+              title: bookDir,
+              chapters: [], // This will be populated later
+            },
           }));
 
         if (chapters.length > 0) {
@@ -53,6 +74,11 @@ async function getAudiobooks(): Promise<Audiobook[]> {
     }
 
     console.log(`扫描完成，共找到 ${books.length} 本有声书`);
+
+    // Save the result to cache file
+    await fs.writeFile(cacheFilePath, JSON.stringify(books), "utf-8");
+    console.log("有声书数据已保存到缓存文件");
+
     return books;
   } catch (error) {
     console.error("读取有声书目录时出错：", error);
