@@ -9,17 +9,11 @@ console.log(AUDIOBOOKS_DIR);
 
 async function getAudiobooks(): Promise<Audiobook[]> {
   const cacheFilePath = path.join(AUDIOBOOKS_DIR, "audiobooks_cache.json");
-  const cacheExpiryTime = 60 * 60 * 1000; // 1 hour in milliseconds
 
   try {
-    const cacheStats = await fs.stat(cacheFilePath);
-    const now = Date.now();
-
-    if (now - cacheStats.mtimeMs < cacheExpiryTime) {
-      console.log("使用缓存的有声书数据");
-      const cachedData = await fs.readFile(cacheFilePath, "utf-8");
-      return JSON.parse(cachedData) as Audiobook[];
-    }
+    const cachedData = await fs.readFile(cacheFilePath, "utf-8");
+    console.log("使用缓存的有声书数据");
+    return JSON.parse(cachedData) as Audiobook[];
   } catch (error) {
     console.log("缓存文件不存在或读取缓存文件时出错，重新扫描目录", error);
   }

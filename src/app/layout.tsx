@@ -7,6 +7,12 @@ export const metadata: Metadata = {
   title: "故事播放器",
   description: "故事播放器",
   icons: [{ rel: "icon", url: "/favicon.ico" }],
+  viewport: {
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 1,
+    userScalable: false,
+  },
 };
 
 export default function RootLayout({
